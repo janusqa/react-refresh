@@ -1,6 +1,5 @@
 import React from 'react';
 import Button from './Button';
-import { nanoid } from 'nanoid';
 // import useItems from '../hooks/useItems';
 import {
     useMarkAllAsComplete,
@@ -33,9 +32,9 @@ export default function ButtonGroup() {
     ];
     return (
         <section className="button-group">
-            {secondaryButtons.map(({ text, handleClick }) => (
+            {secondaryButtons.map(({ text, handleClick }, index) => (
                 <Button
-                    key={nanoid()}
+                    key={`${text}-${index}`}
                     handleClick={handleClick}
                     buttonType="secondary"
                 >
