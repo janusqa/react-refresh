@@ -1,0 +1,54 @@
+I am building a cutting edge, modern, fullstack NextJS web application.
+
+It is a tool for the management of a pet day care business, where clients can send their pets too when they are traveling.
+
+It will have a landing page with an image (which is basically a screenshot of the app in action) and to the left of it a title "Manage your pet daycare with ease". Below that title will be a sub-title "Use PetSoft to easily keep track of pets under your care.  Get lifetime access for $299. and below that are two buttons "Get started", and "Log in". All of this including the image to the right is horizontally and vertially centered on the landing page. This page is fully accessible to everyone.
+
+Users should be able to sign up or sign in.
+
+Authenticated uses (a pet store manager) can log in, which will take them to a "dashboard"
+
+In the authenticated area are two pages Account, and Dashboard (where the user initally goes after siging in)
+
+Each page in the authenticate area has 
+- links to go between the various areas in the private areas.
+- A page title
+- The content for the page
+
+The content for the dashboars is:
+- A search box to search your pets. 
+- A list of your pets (name and little circle image). This is clickable so that when you click on a pet in the list it displays the pet information to the right.
+- Pet detail information (pet owner, pet name, pet age, additional notes) this also encompasses an edit button and a checkout button.
+- a button (a circle with plus sign) to add a pet.
+The lay out is seachbox on the left with list below it and the right shows pet information when appropriate.
+
+New pets are added by cliciing on the add button. Clicking on the add button should pop up a modal to take the pet information:
+- Name of pet
+- Owner name
+- image URL
+- Age
+- Notes
+
+Editing the pet should pop up a modal populating with exising infomation that i can change and save.
+
+Checkout removes the pet from the application.
+
+
+The content for the account page should give you the ability to log out. It also shows who is currently logged in.
+
+
+Trying to access the private area should redirect to the authentication page (signin with option to signup)
+
+
+Clicking on getting started on the landing page should take you to the signup page. After signing it it should take you to a page that indicates that requires payment to proceed and indicates the amount required.  Clicking on the button to proceed will conduct the payment via Stripe. If it is a succes you are redirectd to the dashboard.
+
+Please use one page for both signup and sign in and difrrentiate between them by means of something like search params to decide if to display the signup or signin form.
+
+Better-Auth will be used for authentication.
+
+Data should be stored in a SQLite DB
+
+Do you need more information to create me a technical specification document which i can use as a foundation to then build this application?
+
+
+
