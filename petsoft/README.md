@@ -4,6 +4,16 @@
 2) npx shadcn@latest init (use zinc color pallette when given option)
    1) npx shadcn@latest add <component> e.g. npx shadcn@latest add button
    2) ERROR AFTER INSTALLING: The solution that worked for me was start the project with npm run dev, comment the @import "tw-animate-css"; line in global.css save file, uncomment it and save file again.
+   3) add the below to global.css to renable hand cursor on buttons.  V4 shadcn-ui removed the behaviour
+      ```
+      @layer base {
+         button:not([disabled]),
+         [role="button"]:not([disabled]) {
+            cursor: pointer;
+         }
+      }
+      ```
+   
 
 HOW to hard reset a nextJS project
 - rm -rf .next
