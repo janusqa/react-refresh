@@ -1,11 +1,25 @@
+'use client';
+
+import { usePetContext } from '@/lib/hooks';
+import { cn } from '@/lib/utils';
 import Image from 'next/image';
 
-export default function PetList({ pets }) {
+export default function PetList() {
+    const { pets, selectedPetId, handleChangeSelectedPetId } = usePetContext();
+
     return (
-        <ul className="bg-white border-b border-black/8">
+        <ul className="bg-white border-b border-light">
             {pets.map((pet) => (
                 <li key={pet.id}>
-                    <button className="flex flex-row items-center h-17.5 w-full px-5 text-base gap-3 hover:bg-[#EFF1F1] focus:bg-[#EFF1F1] transition">
+                    <button
+                        onClick={() => handleChangeSelectedPetId(pet.id)}
+                        className={cn(
+                            'flex flex-row items-center h-17.5 w-full px-5 text-base gap-3 hover:bg-[#EFF1F2] focus:bg-[#EFF1F2] transition',
+                            {
+                                'bg-[#EFF1F2]': selectedPetId === pet.id,
+                            },
+                        )}
+                    >
                         <Image
                             src={pet.imageUrl}
                             alt="Pet image"
