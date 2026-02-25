@@ -1,4 +1,4 @@
-### Quickstart
+# Quickstart
 
 1) npx create-next-app@latest .
 2) npx shadcn@latest init (use zinc color pallette when given option)
@@ -19,6 +19,64 @@ HOW to hard reset a nextJS project
 - rm -rf .next
 - npm run dev
 
+
+# Prisma
+
+## install 
+- $ npm install prisma tsx @types/better-sqlite3 -D
+- $ npm install @prisma/client @prisma/adapter-better-sqlite3 dotenv
+- $ npx prisma init --datasource-provider sqlite --output ../src/generated/prisma
+
+# create table schemas
+Update ./prisma/schema.prisma with your table models
+
+# prototype  & experiment changing and updating your shemas
+- $ npx prisma db push  // use when prototyping or experimenting with changes.
+...
+...
+- $ npx prisma db push
+- $ npx prisma db push
+...
+...
+- $ npx prisma db push 
+- $ npx prisma migrate reset // after prototyping or experimenting reset the database which will cause full data loss
+- $ npx prisma migrate dev --name <name-of-migration>  // run a migration to save your changes in a migration
+- $ npx prisma generate
+
+# seeding
+// create a seed script called seed.ts
+// configure primsa.config.ts with the loacation of this seed file
+// examples: https://www.prisma.io/docs/orm/prisma-migrate/workflows/seeding#example-seed-scripts
+```ts
+import "dotenv/config";
+import { defineConfig, env } from "prisma/config";
+export default defineConfig({
+  schema: "prisma/schema.prisma",
+  migrations: {
+    path: "prisma/migrations",
+    seed: "tsx prisma/seed.ts", 
+  },
+  datasource: {
+    url: env("DATABASE_URL"),
+  },
+});
+```
+- $ npx prisma db seed
+
+# use primsa in code
+*** FOR NEXTJS SEE: https://www.prisma.io/docs/guides/frameworks/nextjs ***
+
+otherwise:
+```ts
+import { PrismaClient } from "./generated/prisma/client";
+import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+
+const adapter = new PrismaBetterSqlite3({
+  url: process.env.DATABASE_URL || "file:./dev.db",
+});
+
+export const prisma = new PrismaClient({ adapter });
+```
 ---
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
