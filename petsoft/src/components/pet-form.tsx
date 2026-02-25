@@ -1,10 +1,11 @@
 'use client';
 
 import { usePetContext } from '@/lib/hooks';
-import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
+import { addPet } from '@/actions/actions';
+import PetFormButton from './pet-form-button';
 
 type PetFormProps = {
     actionType: 'add' | 'edit';
@@ -15,12 +16,33 @@ export default function PetForm({
     actionType,
     onFormSubmission,
 }: PetFormProps) {
-    const { handleAddPet, handleEditPet, selectedPet } = usePetContext();
+    // const { handleAddPet, handleEditPet, selectedPet } = usePetContext();
+    const { selectedPet } = usePetContext();
 
-    const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    // const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    //     e.preventDefault();
 
-        const formData = new FormData(e.currentTarget);
+    //     const formData = new FormData(e.currentTarget);
+    //     const petData = {
+    //         name: formData.get('name') as string,
+    //         ownerName: formData.get('ownerName') as string,
+    //         imageUrl:
+    //             (formData.get('imageUrl') as string) ||
+    //             'https://bytegrad.com/course-assets/react-nextjs/pet-placeholder.png',
+    //         age: Number(formData.get('age') as string),
+    //         notes: formData.get('notes') as string,
+    //     };
+
+    //     if (actionType === 'edit' && selectedPet) {
+    //         handleEditPet(selectedPet.id, petData);
+    //     } else if (actionType === 'add') {
+    //         handleAddPet(petData);
+    //     }
+
+    //     onFormSubmission();
+    // };
+
+    const handleSubmit = async (formData: FormData) => {
         const petData = {
             name: formData.get('name') as string,
             ownerName: formData.get('ownerName') as string,
@@ -32,16 +54,17 @@ export default function PetForm({
         };
 
         if (actionType === 'edit' && selectedPet) {
-            handleEditPet(selectedPet.id, petData);
+            // editPet(selectedPet.id, petData);
         } else if (actionType === 'add') {
-            handleAddPet(petData);
+            await addPet(petData);
         }
 
         onFormSubmission();
     };
 
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col">
+        // <form onSubmit={handleSubmit} className="flex flex-col">
+        <form action={handleSubmit} className="flex flex-col">
             <div className="space-y-3">
                 <div className="space-y-1">
                     <Label htmlFor="name">Name</Label>
@@ -106,9 +129,7 @@ export default function PetForm({
                     />
                 </div>
             </div>
-            <Button type="submit" className="mt-5 self-end">
-                {actionType === 'add' ? 'Add Pet' : 'Save Changes'}
-            </Button>
+            <PetFormButton actionType={actionType} />
         </form>
     );
 }

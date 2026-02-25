@@ -1,7 +1,8 @@
 'use client';
 
+import { addPet } from '@/actions/actions';
 import { Pet } from '@/lib/types';
-import { useState, createContext } from 'react';
+import { useState, createContext, useEffect } from 'react';
 
 type PetContextProviderProps = {
     data: Pet[];
@@ -41,17 +42,23 @@ export default function PetContextProvider({
         setPets((prevPets) => prevPets.filter((pet) => pet.id !== id));
         setSelectedPetId(null);
     };
-    const handleAddPet = (pet: Omit<Pet, 'id'>) => {
-        setPets((prevPets) => [
-            ...prevPets,
-            { ...pet, id: crypto.randomUUID() },
-        ]);
+    const handleAddPet = async (pet: Omit<Pet, 'id'>) => {
+        // setPets((prevPets) => [
+        //     ...prevPets,
+        //     { ...pet, id: crypto.randomUUID() },
+        // ]);
+
+        await addPet(pet);
     };
     const handleEditPet = (petId: string, pet: Omit<Pet, 'id'>) => {
         setPets((prevPets) =>
             prevPets.map((p) => (p.id === petId ? { ...pet, id: petId } : p)),
         );
     };
+
+    useEffect(() => {
+        setPets(data);
+    }, [data]);
 
     return (
         <PetContext.Provider
