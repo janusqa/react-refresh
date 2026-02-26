@@ -3,6 +3,9 @@ import { usePetContext } from '@/lib/hooks';
 import { Pet } from '@/lib/types';
 import Image from 'next/image';
 import PetButton from './pet-button';
+import { useTransition } from 'react';
+import { deletePet } from '@/actions/actions';
+import { toast } from 'sonner';
 
 export default function PetDetails() {
     const { selectedPet } = usePetContext();
@@ -27,7 +30,20 @@ type Props = {
 };
 
 function TopBar({ pet }: Props) {
-    const { handleCheckoutPet } = usePetContext();
+    const { handleChangeSelectedPetId, selectedPet } = usePetContext();
+
+    const [isPending, startTransition] = useTransition();
+
+    const onDeletePet = async () => {
+        if (!selectedPet) return;
+        const result = await deletePet(selectedPet.id);
+        if (result.success) {
+            toast.success(result.message);
+            handleChangeSelectedPetId('');
+        } else {
+            toast.error(result.message);
+        }
+    };
 
     return (
         <div className="flex flex-row items-center bg-white px-8 py-5 border-b border-light">
@@ -44,11 +60,16 @@ function TopBar({ pet }: Props) {
             </h2>
 
             <div className="ml-auto space-x-2">
-                <PetButton actionType="edit">Edit</PetButton>
+                <PetButton disabled={isPending} actionType="edit">
+                    Edit
+                </PetButton>
                 <PetButton
+                    disabled={isPending}
                     actionType="checkout"
-                    onClick={() => handleCheckoutPet(pet.id)}
-                />
+                    onClick={() => startTransition(onDeletePet)}
+                >
+                    {isPending ? 'Deleting...' : 'Checkout'}
+                </PetButton>
             </div>
         </div>
     );

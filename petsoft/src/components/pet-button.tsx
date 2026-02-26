@@ -10,24 +10,30 @@ import {
     DialogTrigger,
 } from './ui/dialog';
 import PetForm from './pet-form';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 type PetButtonProps = {
+    disabled?: boolean;
     actionType: 'add' | 'edit' | 'checkout';
     children?: React.ReactNode;
     onClick?: () => void;
 };
 
 export default function PetButton({
+    disabled,
     actionType,
     children,
     onClick,
 }: PetButtonProps) {
     const [isFormOpen, setIsFormOpen] = useState(false);
 
+    const handleFormSubmission = useCallback(() => {
+        setIsFormOpen(false);
+    }, []);
+
     if (actionType === 'checkout') {
         return (
-            <Button variant="secondary" onClick={onClick}>
+            <Button disabled={disabled} variant="secondary" onClick={onClick}>
                 {children || 'Checkout'}
             </Button>
         );
@@ -42,7 +48,7 @@ export default function PetButton({
                             <PlusIcon className="w-6 h-6" />
                         </Button>
                     ) : (
-                        <Button variant="secondary">
+                        <Button disabled={disabled} variant="secondary">
                             {children || 'Edit'}
                         </Button>
                     )}
@@ -57,7 +63,7 @@ export default function PetButton({
                     </DialogHeader>
                     <PetForm
                         actionType={actionType}
-                        onFormSubmission={() => setIsFormOpen(false)}
+                        onFormSubmission={handleFormSubmission}
                     />
                 </DialogContent>
             </Dialog>

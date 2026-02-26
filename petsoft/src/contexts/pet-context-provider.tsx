@@ -1,6 +1,5 @@
 'use client';
 
-import { addPet } from '@/actions/actions';
 import { Pet } from '@/lib/types';
 import { useState, createContext, useEffect } from 'react';
 
@@ -15,9 +14,6 @@ type TPetContext = {
     selectedPet: Pet | undefined;
     numberOfPets: number;
     handleChangeSelectedPetId: (id: string) => void;
-    handleCheckoutPet: (id: string) => void;
-    handleAddPet: (pet: Omit<Pet, 'id'>) => void;
-    handleEditPet: (petId: string, pet: Omit<Pet, 'id'>) => void;
 };
 
 export const PetContext = createContext<TPetContext | null>(null);
@@ -38,23 +34,6 @@ export default function PetContextProvider({
     const handleChangeSelectedPetId = (id: string) => {
         setSelectedPetId(id);
     };
-    const handleCheckoutPet = (id: string) => {
-        setPets((prevPets) => prevPets.filter((pet) => pet.id !== id));
-        setSelectedPetId(null);
-    };
-    const handleAddPet = async (pet: Omit<Pet, 'id'>) => {
-        // setPets((prevPets) => [
-        //     ...prevPets,
-        //     { ...pet, id: crypto.randomUUID() },
-        // ]);
-
-        await addPet(pet);
-    };
-    const handleEditPet = (petId: string, pet: Omit<Pet, 'id'>) => {
-        setPets((prevPets) =>
-            prevPets.map((p) => (p.id === petId ? { ...pet, id: petId } : p)),
-        );
-    };
 
     useEffect(() => {
         setPets(data);
@@ -68,9 +47,6 @@ export default function PetContextProvider({
                 selectedPet,
                 numberOfPets,
                 handleChangeSelectedPetId,
-                handleCheckoutPet,
-                handleAddPet,
-                handleEditPet,
             }}
         >
             {children}
