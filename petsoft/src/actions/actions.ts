@@ -14,7 +14,7 @@ export async function savePet(
 
     const id = formData.get('id') as string;
 
-    const apiData = petSchema.safeParse({
+    const validData = petSchema.safeParse({
         name: formData.get('name'),
         ownerName: formData.get('ownerName'),
         imageUrl: formData.get('imageUrl'),
@@ -22,10 +22,10 @@ export async function savePet(
         notes: formData.get('notes'),
     });
 
-    if (!apiData.success)
+    if (!validData.success)
         return { success: false, message: 'Invalid data', id: null };
 
-    const petData = apiData.data;
+    const petData = validData.data;
 
     try {
         const pet = id
