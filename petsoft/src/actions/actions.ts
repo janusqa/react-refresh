@@ -1,33 +1,38 @@
 'use server';
 
 import prisma from '@/lib/prisma';
+import { Pet, PetFormActionState } from '@/lib/types';
 import { sleep } from '@/lib/utils';
 import { revalidatePath } from 'next/cache';
+import { petSchema } from '@/lib/validation';
 
-type ActionState = {
-    success: boolean;
-    message: string;
-    id: string;
-};
-
-export async function savePet(prevState: ActionState, formData: FormData) {
+export async function savePet(
+    prevState: PetFormActionState,
+    formData: FormData,
+) {
     await sleep(2000);
 
     const id = formData.get('id') as string;
 
-    const petData = {
-        name: formData.get('name') as string,
-        ownerName: formData.get('ownerName') as string,
-        imageUrl:
-            (formData.get('imageUrl') as string) ||
-            'https://bytegrad.com/course-assets/react-nextjs/pet-placeholder.png',
-        age: Number(formData.get('age') as string),
-        notes: formData.get('notes') as string,
-    };
+    const apiData = petSchema.safeParse({
+        name: formData.get('name'),
+        ownerName: formData.get('ownerName'),
+        imageUrl: formData.get('imageUrl'),
+        age: formData.get('age'),
+        notes: formData.get('notes'),
+    });
+
+    if (!apiData.success)
+        return { success: false, message: 'Invalid data', id: null };
+
+    const petData = apiData.data;
 
     try {
         const pet = id
-            ? await prisma.pet.update({ where: { id }, data: petData })
+            ? await prisma.pet.update({
+                  where: { id },
+                  data: petData,
+              })
             : await prisma.pet.create({ data: petData });
 
         revalidatePath('/app', 'layout');
@@ -35,11 +40,11 @@ export async function savePet(prevState: ActionState, formData: FormData) {
         return { success: true, message: 'Saved successfully', id: pet.id };
     } catch (error) {
         console.error(error);
-        return { success: false, message: 'Database error occurred', id: '' };
+        return { success: false, message: 'Database error occurred', id: null };
     }
 }
 
-export async function deletePet(id: string) {
+export async function deletePet(id: Pet['id']) {
     await sleep(2000);
 
     try {
@@ -47,7 +52,7 @@ export async function deletePet(id: string) {
         revalidatePath('/app', 'layout');
         return { success: true, message: 'Deleted successfully', id: pet.id };
     } catch (error) {
-        console.log(error);
-        return { success: false, message: 'Database error occurred', id: '' };
+        console.error(error);
+        return { success: false, message: 'Database error occurred', id: null };
     }
 }
