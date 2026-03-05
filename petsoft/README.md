@@ -39,7 +39,7 @@ Update ./prisma/schema.prisma with your table models
 ...
 ...
 - $ npx prisma db push 
-- $ npx prisma migrate reset // after prototyping or experimenting reset the database which will cause full data loss
+- $ npx prisma migrate reset (npx prisma db push --force-reset)// after prototyping or experimenting reset the database which will cause full data loss
 - $ npx prisma migrate dev --name <name-of-migration>  // run a migration to save your changes in a migration
 - $ npx prisma generate
 
@@ -79,6 +79,73 @@ export const prisma = new PrismaClient({ adapter });
 ```
 ---
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+
+## Authentication/Authorization
+
+### better-auth
+- https://better-auth.com/docs/installation
+- npm install better-auth  
+- npm install @better-auth/prisma-adapter
+- generate a secret key 
+- add to .env
+  - BETTER_AUTH_SECRET=
+  - BETTER_AUTH_URL=
+- set up /lib/auth.ts  (see docs for using different orms ect)
+  - ```ts
+      import { betterAuth } from "better-auth";
+      import { prismaAdapter } from "better-auth/adapters/prisma";
+      // If your Prisma file is located elsewhere, you can change the path
+      import { PrismaClient } from "@/generated/prisma/client";
+
+      const prisma = new PrismaClient();
+      export const auth = betterAuth({
+          database: prismaAdapter(prisma, {
+              provider: "sqlite", // or "mysql", "postgresql", ...etc
+          }),
+      });
+    ```
+- setup lib/auth-client.ts for client components to use, lib/auth-session.ts for server components and actions, and lib/auth-session-middleware.ts for middle ware
+- npx auth@latest generate
+- npx prisma db push (or migrate command if you are using migrations)
+- npx prisma generate (ALWAYS REGENERATE CLIENT AFTER DB CHANGES)
+- setup the catch all routes api handler (see installation in docs)
+  - /app/api/auth/[..all]/routes.ts
+  - ```ts
+      import { auth } from '@/lib/auth'; // path to your auth file
+      import { toNextJsHandler } from 'better-auth/next-js';
+
+      const authHandlers = toNextJsHandler(auth);
+
+      export const { GET } = authHandlers;
+
+      export async function POST(request: Request) {
+          const clonedRequest = request.clone();
+
+          // use ArcJet to do different protections here
+          // It will use "request" so clone it so authHandlers
+          // can use a copy of "request" while arcJet uses
+          // "request"
+
+          return authHandlers.POST(clonedRequest);
+      }
+
+    ```
+- /proxy.ts
+    - ```ts
+        import { getSession } from './lib/auth-session';
+        import { NextRequest, NextResponse } from 'next/server';
+
+        export async function proxy(request: NextRequest) {
+          const session = await getSession(request);
+
+          if (!session) return NextResponse.redirect(new URL('/login', request.url));
+        }
+
+        export const config = {
+            matcher: ['/app/:path*'],
+        };
+      ```
 
 ## Getting Started
 

@@ -1,9 +1,18 @@
-import type { Pet as PrismaPet } from '@/generated/prisma/client';
+import z from 'zod';
+import type { User } from '@/generated/prisma/client';
+import { CredentialsSchema, PetSchema } from './validation';
 
-export type Pet = Omit<PrismaPet, 'createdAt' | 'updatedAt'>;
-
-export type PetFormActionState = {
+type BaseActionState = {
     success: boolean;
     message: string;
-    id: Pet['id'] | null;
 };
+
+export type PetFormActionState = BaseActionState & {
+    id: TPet['id'] | null;
+};
+
+export type AuthFormActionState = BaseActionState;
+
+export type TCredentials = z.infer<typeof CredentialsSchema>;
+export type TPet = z.infer<typeof PetSchema>;
+export type TUser = Omit<User, 'createdAt' | 'updatedAt'>;

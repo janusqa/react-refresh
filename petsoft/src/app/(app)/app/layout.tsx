@@ -1,26 +1,21 @@
 import AppFooter from '@/components/app-footer';
 import AppHeader from '@/components/app-header';
 import BackgroundPattern from '@/components/background-pattern';
-import { Toaster } from '@/components/ui/sonner';
 import PetContextProvider from '@/contexts/pet-context-provider';
 import SearchContextProvider from '@/contexts/search-context-provider';
-// import { Pet } from '@/lib/types';
-import prisma from '@/lib/prisma';
+import { getSession } from '@/lib/auth-session';
+import { petService } from '@/services/pet.service';
+import { redirect } from 'next/navigation';
 
 export default async function Layout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    // const response = await fetch(
-    //     'https://bytegrad.com/course-assets/projects/petsoft/api/pets',
-    // );
-    // if (!response.ok) {
-    //     throw new Error('Could not fetch pets');
-    // }
-    // const data: Pet[] = await response.json();
+    const session = await getSession();
+    if (!session) redirect('/login');
 
-    const data = await prisma.pet.findMany();
+    const data = await petService.getPets(session.user.id);
 
     return (
         <>
@@ -34,7 +29,6 @@ export default async function Layout({
                 </SearchContextProvider>
                 <AppFooter />
             </div>
-            <Toaster position="top-right" />
         </>
     );
 }

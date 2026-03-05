@@ -1,7 +1,8 @@
 import z from 'zod';
 
-export const petSchema = z
+export const PetSchema = z
     .object({
+        id: z.union([z.literal(''), z.cuid()]).optional(),
         name: z
             .string()
             .trim()
@@ -14,7 +15,7 @@ export const petSchema = z
             .max(100),
         imageUrl: z.union([
             z.literal(''),
-            z.string().trim().url({ message: 'Image url must be a valid url' }),
+            z.url({ message: 'Image url must be a valid url' }),
         ]),
         age: z.coerce
             .number()
@@ -29,3 +30,11 @@ export const petSchema = z
             data.imageUrl ||
             'https://bytegrad.com/course-assets/react-nextjs/pet-placeholder.png',
     }));
+
+export const CredentialsSchema = z.object({
+    email: z.email({ message: 'Invalid email address' }).trim().toLowerCase(),
+    password: z
+        .string()
+        .min(8, { message: 'Password must be at least 8 characters' }),
+    callbackUrl: z.union([z.string().trim().startsWith('/'), z.literal('')]),
+});

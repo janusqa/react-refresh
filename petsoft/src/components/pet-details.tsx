@@ -1,10 +1,10 @@
 'use client';
 import { usePetContext } from '@/lib/hooks';
-import { Pet } from '@/lib/types';
+import { TPet } from '@/lib/types';
 import Image from 'next/image';
 import PetButton from './pet-button';
 import { useTransition } from 'react';
-import { deletePet } from '@/actions/actions';
+import { deletePet } from '@/actions/pet.actions';
 import { toast } from 'sonner';
 
 export default function PetDetails() {
@@ -26,7 +26,7 @@ export default function PetDetails() {
 }
 
 type Props = {
-    pet: Pet;
+    pet: TPet;
 };
 
 function TopBar({ pet }: Props) {

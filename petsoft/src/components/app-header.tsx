@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Logo from './logo';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { SignoutButtonNative } from './signout-button';
 
 const routes = [
     {
@@ -40,6 +41,9 @@ export default function AppHeader() {
                             </Link>
                         </li>
                     ))}
+                    <li>
+                        <SignoutButtonNative className="text-white/70 hover:text-white" />
+                    </li>
                 </ul>
             </nav>
         </header>

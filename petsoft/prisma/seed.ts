@@ -1,4 +1,10 @@
+import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+
+const users = [
+    { email: 'john@test.com', password: 'password' },
+    { email: 'jane@test.com', password: 'password' },
+];
 
 const pets = [
     {
@@ -27,11 +33,32 @@ const pets = [
 async function main() {
     console.log(`Start seeding ...`);
 
+    // seed users
+    for (const user of users) {
+        try {
+            await auth.api.signUpEmail({
+                body: {
+                    email: user.email,
+                    password: user.password,
+                    name: user.email,
+                },
+            });
+        } catch (error) {
+            console.error(error);
+            console.log(`User ${user.email} already exists, skipping...`);
+        }
+    }
+
+    // fetch users to get their ids
+    const createdUsers = await prisma.user.findMany();
+
+    // seed pets linked to users
     for (const pet of pets) {
-        const result = await prisma.pet.create({
-            data: pet,
+        const randomUser =
+            createdUsers[Math.floor(Math.random() * createdUsers.length)];
+        await prisma.pet.create({
+            data: { ...pet, userId: randomUser.id },
         });
-        console.log(`Created pet with id: ${result.id}`);
     }
 
     console.log(`Seeding finished.`);

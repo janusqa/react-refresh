@@ -1,10 +1,12 @@
 'use server';
 
-import prisma from '@/lib/prisma';
-import { Pet, PetFormActionState } from '@/lib/types';
+import { PetFormActionState } from '@/lib/types';
 import { sleep } from '@/lib/utils';
 import { revalidatePath } from 'next/cache';
-import { petSchema } from '@/lib/validation';
+import { PetSchema } from '@/lib/validation';
+import z from 'zod';
+import { petService } from '@/services/pet.service';
+import { getSession } from '@/lib/auth-session';
 
 export async function savePet(
     prevState: PetFormActionState,
@@ -12,9 +14,15 @@ export async function savePet(
 ) {
     await sleep(2000);
 
-    const id = formData.get('id') as string;
+    const userSession = await getSession();
 
-    const validData = petSchema.safeParse({
+    if (!userSession)
+        return { success: false, message: 'Unauthorized', id: null };
+
+    const { user } = userSession;
+
+    const validData = PetSchema.safeParse({
+        id: formData.get('id'),
         name: formData.get('name'),
         ownerName: formData.get('ownerName'),
         imageUrl: formData.get('imageUrl'),
@@ -25,16 +33,8 @@ export async function savePet(
     if (!validData.success)
         return { success: false, message: 'Invalid data', id: null };
 
-    const petData = validData.data;
-
     try {
-        const pet = id
-            ? await prisma.pet.update({
-                  where: { id },
-                  data: petData,
-              })
-            : await prisma.pet.create({ data: petData });
-
+        const pet = await petService.savePet(user.id, validData.data);
         revalidatePath('/app', 'layout');
 
         return { success: true, message: 'Saved successfully', id: pet.id };
@@ -44,11 +44,25 @@ export async function savePet(
     }
 }
 
-export async function deletePet(id: Pet['id']) {
+export async function deletePet(petId: unknown) {
     await sleep(2000);
 
+    const userSession = await getSession();
+
+    if (!userSession)
+        return { success: false, message: 'Unauthorized', id: null };
+
+    const { user } = userSession;
+
+    const validId = z.cuid().safeParse(petId);
+
+    if (!validId.success)
+        return { success: false, message: 'Invalid Id', id: null };
+
+    const id = validId.data;
+
     try {
-        const pet = await prisma.pet.delete({ where: { id } });
+        const pet = await petService.deletePet(user.id, id);
         revalidatePath('/app', 'layout');
         return { success: true, message: 'Deleted successfully', id: pet.id };
     } catch (error) {

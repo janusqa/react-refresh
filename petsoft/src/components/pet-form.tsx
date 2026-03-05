@@ -4,12 +4,12 @@ import { usePetContext } from '@/lib/hooks';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
-import { savePet } from '@/actions/actions';
+import { savePet } from '@/actions/pet.actions';
 import { toast } from 'sonner';
 import { startTransition, useActionState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { PetFormActionState } from '@/lib/types';
-import { petSchema } from '@/lib/validation';
+import { PetSchema } from '@/lib/validation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -39,7 +39,7 @@ export default function PetForm({
         trigger,
         formState: { errors },
     } = useForm({
-        resolver: zodResolver(petSchema),
+        resolver: zodResolver(PetSchema),
         defaultValues: actionType === 'edit' ? selectedPet : undefined,
     });
 
@@ -73,14 +73,7 @@ export default function PetForm({
             }}
             className="flex flex-col"
         >
-            <Input
-                type="hidden"
-                id="id"
-                name="id"
-                defaultValue={
-                    actionType === 'edit' ? selectedPet?.id : undefined
-                }
-            />
+            <Input type="hidden" id="id" {...register('id')} />
             <div className="space-y-3">
                 <div className="space-y-1">
                     <Label htmlFor="name">Name</Label>

@@ -1,6 +1,8 @@
 import { PetContext } from '@/contexts/pet-context-provider';
 import { SearchContext } from '@/contexts/search-context-provider';
-import { useContext } from 'react';
+import { useContext, useTransition } from 'react';
+import { authClient } from './auth-client';
+import { signout } from '@/actions/auth.actions';
 
 export function usePetContext() {
     const context = useContext(PetContext);
@@ -24,4 +26,16 @@ export function useSearchContext() {
     }
 
     return context;
+}
+
+export function useSignout() {
+    const { data: session } = authClient.useSession();
+    const [isPending, startTransition] = useTransition();
+
+    const handleSignout = () =>
+        startTransition(async () => {
+            await signout();
+        });
+
+    return { session, isPending, handleSignout };
 }
