@@ -13,14 +13,14 @@ export async function signin(
     if (!(formData instanceof FormData))
         return { success: false, message: 'Invalid data' };
 
-    let redirectPath: string | null = null;
-
     const validData = CredentialsSchema.safeParse(
         Object.fromEntries(formData.entries()),
     );
     if (!validData.success)
         return { success: false, message: 'Invalid credentials' };
     const data = validData.data;
+
+    let redirectPath: string | null = null;
 
     try {
         await authService.signin(data);
@@ -46,14 +46,14 @@ export async function signup(
     if (!(formData instanceof FormData))
         return { success: false, message: 'Invalid data' };
 
-    let redirectPath: string | null = null;
-
     const validData = CredentialsSchema.safeParse(
         Object.fromEntries(formData.entries()),
     );
     if (!validData.success)
         return { success: false, message: 'Invalid credentials' };
     const data = validData.data;
+
+    let redirectPath: string | null = null;
 
     try {
         await authService.signup(data);
