@@ -8,17 +8,18 @@ import { redirect } from 'next/navigation';
 
 export async function signin(
     prevState: AuthFormActionState,
-    formData: FormData,
+    formData: unknown,
 ) {
+    if (!(formData instanceof FormData))
+        return { success: false, message: 'Invalid data' };
+
     let redirectPath: string | null = null;
 
     const validData = CredentialsSchema.safeParse(
         Object.fromEntries(formData.entries()),
     );
-
     if (!validData.success)
         return { success: false, message: 'Invalid credentials' };
-
     const data = validData.data;
 
     try {
@@ -40,17 +41,18 @@ export async function signin(
 
 export async function signup(
     prevState: AuthFormActionState,
-    formData: FormData,
+    formData: unknown,
 ) {
+    if (!(formData instanceof FormData))
+        return { success: false, message: 'Invalid data' };
+
     let redirectPath: string | null = null;
 
     const validData = CredentialsSchema.safeParse(
         Object.fromEntries(formData.entries()),
     );
-
     if (!validData.success)
         return { success: false, message: 'Invalid credentials' };
-
     const data = validData.data;
 
     try {
@@ -72,8 +74,6 @@ export async function signup(
 
 export async function signout() {
     let redirectPath: string | null = null;
-
-    console.log('got here');
 
     try {
         await authService.signout();

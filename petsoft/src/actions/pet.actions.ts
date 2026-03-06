@@ -10,15 +10,16 @@ import { getSession } from '@/lib/auth-session';
 
 export async function savePet(
     prevState: PetFormActionState,
-    formData: FormData,
+    formData: unknown,
 ) {
     await sleep(2000);
 
-    const userSession = await getSession();
+    if (!(formData instanceof FormData))
+        return { success: false, message: 'Invalid data', id: null };
 
+    const userSession = await getSession();
     if (!userSession)
         return { success: false, message: 'Unauthorized', id: null };
-
     const { user } = userSession;
 
     const validData = PetSchema.safeParse({
@@ -29,7 +30,6 @@ export async function savePet(
         age: formData.get('age'),
         notes: formData.get('notes'),
     });
-
     if (!validData.success)
         return { success: false, message: 'Invalid data', id: null };
 
@@ -48,17 +48,13 @@ export async function deletePet(petId: unknown) {
     await sleep(2000);
 
     const userSession = await getSession();
-
     if (!userSession)
         return { success: false, message: 'Unauthorized', id: null };
-
     const { user } = userSession;
 
     const validId = z.cuid().safeParse(petId);
-
     if (!validId.success)
         return { success: false, message: 'Invalid Id', id: null };
-
     const id = validId.data;
 
     try {
